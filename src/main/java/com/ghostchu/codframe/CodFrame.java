@@ -2,9 +2,8 @@ package com.ghostchu.codframe;
 
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -29,6 +28,7 @@ import java.util.UUID;
 
 public final class CodFrame extends JavaPlugin implements Listener {
     private final NamespacedKey KEY = new NamespacedKey(this, "owner");
+    private final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
     @Override
     public void onEnable() {
@@ -43,13 +43,17 @@ public final class CodFrame extends JavaPlugin implements Listener {
 
     public Optional<UUID> queryProtection(ItemFrame frame) {
         String dat = frame.getPersistentDataContainer().get(KEY, PersistentDataType.STRING);
-        if (dat == null) return Optional.empty();
+        if (dat == null) {
+            return Optional.empty();
+        }
         UUID uuid = UUID.fromString(dat);
         return Optional.of(uuid);
     }
 
     public boolean claimProtection(ItemFrame frame, UUID uuid) {
-        if (queryProtection(frame).isPresent()) return false;
+        if (queryProtection(frame).isPresent()) {
+            return false;
+        }
         frame.getPersistentDataContainer().set(KEY, PersistentDataType.STRING, uuid.toString());
         frame.setFixed(true);
         frame.setInvulnerable(true);
@@ -57,7 +61,9 @@ public final class CodFrame extends JavaPlugin implements Listener {
     }
 
     public boolean removeProtection(ItemFrame frame, UUID uuid) {
-        if (!queryProtection(frame).isPresent()) return false;
+        if (!queryProtection(frame).isPresent()) {
+            return false;
+        }
         frame.setFixed(false);
         frame.getPersistentDataContainer().remove(KEY);
         frame.setInvulnerable(false);
@@ -65,40 +71,39 @@ public final class CodFrame extends JavaPlugin implements Listener {
     }
 
     public void openBook(ItemFrame frame, Player player) {
-        if (frame.getItem().getItemMeta() instanceof BookMeta) {
-            BookMeta meta = (BookMeta) frame.getItem().getItemMeta();
+        if (frame.getItem().getItemMeta() instanceof BookMeta meta) {
             Component author = meta.author();
             Component title = meta.title();
-            if (author == null)
-                author = Component.text("匿名");
-            if (title == null)
-                title = Component.text("无题");
+            if (author == null) {
+                author = MINI_MESSAGE.deserialize(getConfig().getString("messages.book.anonymous", ""));
+            }
+            if (title == null) {
+                title = MINI_MESSAGE.deserialize(getConfig().getString("messages.book.no-title", ""));
+            }
             player.openBook(Book.book(title, author, meta.pages()));
         }
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        if (sender instanceof Player player) {
             Entity target = player.getTargetEntity(4);
-            if (target instanceof ItemFrame) {
-                ItemFrame frame = (ItemFrame) target;
+            if (target instanceof ItemFrame frame) {
                 if (claimProtection(frame, player.getUniqueId())) {
-                    player.sendMessage(ChatColor.GREEN + "成功设置该物品展示框为鱼框");
+                    player.sendMessage(MINI_MESSAGE.deserialize(getConfig().getString("messages.frame.success-set", "")));
                 } else {
                     Optional<UUID> uuid = queryProtection(frame);
                     if (uuid.isPresent()) {
                         if (uuid.get().equals(player.getUniqueId()) || player.hasPermission("codframe.admin")) {
                             removeProtection(frame, player.getUniqueId());
-                            player.sendMessage(ChatColor.GREEN + "成功恢复为普通物品展示框");
+                            player.sendMessage(MINI_MESSAGE.deserialize(getConfig().getString("messages.frame.success-remove", "")));
                         } else {
-                            player.sendMessage(ChatColor.RED + "该物品展示框已被其他玩家保护");
+                            player.sendMessage(MINI_MESSAGE.deserialize(getConfig().getString("messages.frame.failed-other-protected", "")));
                         }
                     }
                 }
             } else {
-                player.sendMessage(ChatColor.RED + "鱼框效果只能作用在物品展示框上哒！");
+                player.sendMessage(MINI_MESSAGE.deserialize(getConfig().getString("messages.frame.failed-invalid", "")));
             }
             return true;
         }
@@ -107,8 +112,7 @@ public final class CodFrame extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFrameDropping(HangingBreakEvent event) {
-        if (event.getEntity() instanceof ItemFrame) {
-            ItemFrame frame = (ItemFrame) event.getEntity();
+        if (event.getEntity() instanceof ItemFrame frame) {
             if (queryProtection(frame).isPresent()) {
                 event.setCancelled(true);
             }
@@ -117,8 +121,7 @@ public final class CodFrame extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFrameDamaging(EntityDamageEvent event) {
-        if (event.getEntity() instanceof ItemFrame) {
-            ItemFrame frame = (ItemFrame) event.getEntity();
+        if (event.getEntity() instanceof ItemFrame frame) {
             if (queryProtection(frame).isPresent()) {
                 event.setCancelled(true);
             }
@@ -127,8 +130,7 @@ public final class CodFrame extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFrameDamaging(EntityDamageByBlockEvent event) {
-        if (event.getEntity() instanceof ItemFrame) {
-            ItemFrame frame = (ItemFrame) event.getEntity();
+        if (event.getEntity() instanceof ItemFrame frame) {
             if (queryProtection(frame).isPresent()) {
                 event.setCancelled(true);
             }
@@ -137,8 +139,7 @@ public final class CodFrame extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFrameDamaging(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof ItemFrame) {
-            ItemFrame frame = (ItemFrame) event.getEntity();
+        if (event.getEntity() instanceof ItemFrame frame) {
             if (queryProtection(frame).isPresent()) {
                 event.setCancelled(true);
             }
@@ -147,8 +148,7 @@ public final class CodFrame extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void interactFrame(PlayerInteractEntityEvent event) {
-        if (event.getRightClicked() instanceof ItemFrame) {
-            ItemFrame frame = (ItemFrame) event.getRightClicked();
+        if (event.getRightClicked() instanceof ItemFrame frame) {
             if (queryProtection(frame).isPresent()) {
                 event.setCancelled(true);
                 if (frame.getItem().hasItemMeta()) {
@@ -160,6 +160,6 @@ public final class CodFrame extends JavaPlugin implements Listener {
     }
 
     private void sendChatPreview(ItemStack item, Player player) {
-        player.sendMessage(Component.text("鼠标悬浮在此处来预览该展示物品").color(NamedTextColor.AQUA).hoverEvent(item.asHoverEvent()));
+        player.sendMessage(MINI_MESSAGE.deserialize(getConfig().getString("messages.general.hover-preview", "")).hoverEvent(item.asHoverEvent()));
     }
 }

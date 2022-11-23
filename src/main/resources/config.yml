@@ -1,0 +1,11 @@
+messages:
+  general:
+    hover-preview: "<aqua>Hover your mouse cursor on this text to preview this item."
+  book:
+    anonymous: "Anonymous"
+    no-title: "No Title"
+  frame:
+    success-set: "<green>Successfully set this ItemFrame as a CodFrame."
+    success-remove: "<green>Successfully remove this CodFrame, now it is a regular ItemFrame."
+    failed-other-protected: "<red>Failed to protect this ItemFrame -- This ItemFrame already protected by other Player."
+    failed-invalid: "<red>You can only protect ItemFrame!"
