@@ -33,6 +33,7 @@ public final class CodFrame extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         // Plugin startup logic
+        saveDefaultConfig();
         Bukkit.getPluginManager().registerEvents(this, this);
     }
 
