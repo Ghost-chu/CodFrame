@@ -42,7 +42,6 @@ jobs:
         files-primary: target/!(*-@(dev|sources|javadoc)).jar
         files-secondary: target/*-@(dev|sources|javadoc).jar
         loaders: |
-          spigot
           paper
           purpur
         game-versions: |
