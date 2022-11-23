@@ -40,8 +40,9 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         github-draft: false
         
-        curseforge-id: 709849
-        curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+        #curseforge-id: 709849
+        #curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+        #curseforge-name: "Codframe"
         
         files-primary: target/!(*-@(dev|sources|javadoc)).jar
         files-secondary: target/*-@(dev|sources|javadoc).jar
