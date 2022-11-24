@@ -6,6 +6,8 @@ A simple ItemFrame protect and in-frame item preview plugin.
 
 **This plugin require Java 17 and up to be run.**
 
+[Modrinth](https://modrinth.com/plugin/codframe)
+
 ## Why CodFrame
 
 CodFrame can protect your items in itemframe to avoid grief like explosion, shoot, lava, fire, block break, interact, rotate. 
@@ -21,3 +23,4 @@ Also provide a cool and useful item-showcase feature to allow any player preview
 ## Demo Video
 
 [![DemoVideo](http://img.youtube.com/vi/WFKfd7CN-BU/0.jpg)](https://www.youtube.com/watch?v=WFKfd7CN-BU)
+
