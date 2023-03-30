@@ -7,3 +7,4 @@ commands:
   codframe:
     description: Lock or unlock an ItemFrame
     usage: /codframe
+folia-supported: true
